@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY CodeInspector.sln ./
+COPY CodeInspector.slnx ./
 COPY src/CodeInspector.Leads.Core ./src/CodeInspector.Leads.Core
 COPY src/CodeInspector.Leads.Infrastructure ./src/CodeInspector.Leads.Infrastructure
 COPY src/CodeInspector.Leads.Worker ./src/CodeInspector.Leads.Worker
