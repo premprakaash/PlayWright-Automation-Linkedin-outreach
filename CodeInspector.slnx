@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CodeInspector.Leads.Api/CodeInspector.Leads.Api.csproj" />
+    <Project Path="src/CodeInspector.Leads.BrowserLauncher/CodeInspector.Leads.BrowserLauncher.csproj" />
+    <Project Path="src/CodeInspector.Leads.Core/CodeInspector.Leads.Core.csproj" />
+    <Project Path="src/CodeInspector.Leads.Infrastructure/CodeInspector.Leads.Infrastructure.csproj" />
+    <Project Path="src/CodeInspector.Leads.Worker/CodeInspector.Leads.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CodeInspector.Leads.Tests/CodeInspector.Leads.Tests.csproj" />
+  </Folder>
+</Solution>
