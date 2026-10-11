@@ -1,0 +1,2 @@
+company_name,company_website,country,industry,employee_range,technology_signals,full_name,job_title,linkedin_profile_url,business_email,source_type,source_url,notes
+Acme SaaS,https://acme.example,US,SaaS,11-50,.NET;C#,Jane Doe,CTO,https://www.linkedin.com/in/jane-doe,jane@acme.example,manual_linkedin,https://www.linkedin.com/search/results/people/,Reviewed manually from LinkedIn search

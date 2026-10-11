@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: codeinspector
+      POSTGRES_USER: codeinspector
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codeinspector}
+    volumes:
+      - leads_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codeinspector -d codeinspector"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  leads-api:
+    build:
+      context: .
+      dockerfile: docker/leads-api.Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__LeadsDatabase: Host=postgres;Port=5432;Database=codeinspector;Username=codeinspector;Password=${POSTGRES_PASSWORD:-codeinspector};Search Path=leads,public
+      Authentication__Jwt__Key: ${JWT_SIGNING_KEY:-development-only-change-me-32-characters-min}
+      Authentication__Jwt__Issuer: CodeInspector.Leads
+      Authentication__Jwt__Audience: CodeInspector.Leads.Client
+      Cors__Origins__0: http://localhost:5173
+      Cors__Origins__1: http://localhost:3000
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  leads-worker:
+    build:
+      context: .
+      dockerfile: docker/leads-worker.Dockerfile
+    environment:
+      ConnectionStrings__LeadsDatabase: Host=postgres;Port=5432;Database=codeinspector;Username=codeinspector;Password=${POSTGRES_PASSWORD:-codeinspector};Search Path=leads,public
+      DailyProcessing__Cron: ${DAILY_PROCESSING_CRON:-0 0 9 * * ?}
+      DailyProcessing__TimeZone: ${DAILY_PROCESSING_TZ:-Asia/Kolkata}
+      DailyProcessing__BatchSize: ${DAILY_PROCESSING_BATCH_SIZE:-100}
+      Browser__Headless: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      leads-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  leads-web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    depends_on:
+      leads-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  leads_pg_data:
